@@ -35,16 +35,16 @@ class CandidateController {
     } = request.body;
 
     if (!cpf) {
-      return response.status(400).json({ error: 'Campo CPF é obrigatório' });
+      return response.status(400).json({ error: 'Digite um CPF' });
     }
 
     const cpfExists = await UsersRepository.findByCpf(cpf);
     if (!cpfExists) {
-      return response.status(404).json({ error: 'CPF não encontrado' });
+      return response.status(404).json({ error: 'Usuário não encontrado' });
     }
 
     if (!ad_id) {
-      return response.status(400).json({ error: 'Necessário informar o anúncio' });
+      return response.status(400).json({ error: 'Escolha um anúncio' });
     }
 
     const adExists = await AdsRepository.findById(ad_id);

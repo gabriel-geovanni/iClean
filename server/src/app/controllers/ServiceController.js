@@ -27,19 +27,19 @@ class ServiceController {
     } = request.body;
 
     if (!type) {
-      return response.status(400).json({ error: 'Campo TIPO é obrigatório' });
+      return response.status(400).json({ error: 'Digite o tipo do serviço' });
     }
 
     if (!price) {
-      return response.status(400).json({ error: 'Necessário informar o valor do serviço' });
+      return response.status(400).json({ error: 'Digite o valor do serviço' });
     }
 
     if (!date) {
-      return response.status(400).json({ error: 'Necessário informar a data que foi efetuado' });
+      return response.status(400).json({ error: 'Digite a data que foi/será efetuado' });
     }
 
     if (!cpf_provider) {
-      return response.status(400).json({ error: 'Necessário quem efetuou o serviço' });
+      return response.status(400).json({ error: 'Informe o CPF do prestador do serviço' });
     }
 
     const cpfProviderExists = await UsersRepository.findByCpf(cpf_provider);
@@ -48,7 +48,7 @@ class ServiceController {
     }
 
     if (!cpf_customer) {
-      return response.status(400).json({ error: 'Necessário informar quem contratou o serviço' });
+      return response.status(400).json({ error: 'Informe o CPF do contratante do serviço' });
     }
 
     const cpfCustomerExists = await UsersRepository.findByCpf(cpf_customer);
@@ -57,7 +57,7 @@ class ServiceController {
     }
 
     if (!ad_id) {
-      return response.status(400).json({ error: 'Necessário informar o anúncio' });
+      return response.status(400).json({ error: 'Escolha um anúncio' });
     }
 
     const adExists = await AdsRepository.findById(ad_id);
@@ -84,19 +84,19 @@ class ServiceController {
     }
 
     if (!type) {
-      return response.status(400).json({ error: 'Campo TIPO é obrigatório' });
+      return response.status(400).json({ error: 'Digite o tipo do serviço' });
     }
 
     if (!price) {
-      return response.status(400).json({ error: 'Necessário informar o valor do serviço' });
+      return response.status(400).json({ error: 'Digite o valor do serviço' });
     }
 
     if (!date) {
-      return response.status(400).json({ error: 'Necessário informar a data que foi efetuado' });
+      return response.status(400).json({ error: 'Digite a data que foi/será efetuado' });
     }
 
     if (!status) {
-      return response.status(400).json({ error: 'Necessário informar o status do serviço' });
+      return response.status(400).json({ error: 'Informe o status do serviço' });
     }
 
     const service = await ServicesRepository.update(id, {

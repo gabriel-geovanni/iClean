@@ -1,21 +1,22 @@
 const db = require('../../database');
+const UsersRepository = require('./UsersRepository');
+const RatingsRepository = require('./RatingsRepository');
 
 class AdsRepository {
   async findAll(orderBy = 'ASC') {
     const direction = orderBy.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-    const rows = await db.query(`SELECT * FROM ads ORDER BY price ${direction}`);
+    const ads = await db.query(`SELECT * FROM ads ORDER BY price ${direction}`);
+    const list = await Promise.all(ads.map(async (ad) => {
+      const user = await UsersRepository.findByCpf(ad.ucpf);
+      const average = await RatingsRepository.findByCpf(ad.ucpf);
+      return { ...ad, user, average };
+    }));
 
-    return rows;
+    return list;
   }
 
   async findById(id) {
     const [row] = await db.query('SELECT * FROM ads A WHERE A.id = $1', [id]);
-
-    return row;
-  }
-
-  async findByType(type) {
-    const [row] = await db.query('SELECT * FROM ads A WHERE A.type = $1', [type]);
 
     return row;
   }

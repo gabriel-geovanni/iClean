@@ -26,19 +26,19 @@ class AdController {
     } = request.body;
 
     if (!type) {
-      return response.status(400).json({ error: 'Campo TIPO é obrigatório' });
+      return response.status(400).json({ error: 'Digite o tipo do serviço' });
     }
 
     if (!price) {
-      return response.status(400).json({ error: 'Necessário informar o valor do serviço' });
+      return response.status(400).json({ error: 'Digite um valor' });
     }
 
     if (!availability) {
-      return response.status(400).json({ error: 'Necessário informar sua disponibilidade' });
+      return response.status(400).json({ error: 'Informe sua disponibilidade para o serviço' });
     }
 
     if (!cpf) {
-      return response.status(400).json({ error: 'Necessário informar o CPF do criador do anúncio' });
+      return response.status(400).json({ error: 'Informe o cpf do criado do anúncio' });
     }
 
     const usersExists = await UsersRepository.findByCpf(cpf);
@@ -65,15 +65,15 @@ class AdController {
     }
 
     if (!type) {
-      return response.status(400).json({ error: 'Campo TIPO é obrigatório' });
+      return response.status(400).json({ error: 'Digite o tipo do anúncio' });
     }
 
     if (!price) {
-      return response.status(400).json({ error: 'Necessário informar o valor do serviço' });
+      return response.status(400).json({ error: 'Digite um valor' });
     }
 
     if (!availability) {
-      return response.status(400).json({ error: 'Necessário informar sua disponibilidade' });
+      return response.status(400).json({ error: 'Informe sua disponibilidade para o serviço' });
     }
 
     const ad = await AdsRepository.update(id, {
