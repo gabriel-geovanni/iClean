@@ -20,26 +20,26 @@ class UsersRepository {
   }
 
   async create({
-    cpf, name, email, phone,
+    cpf, name, password, email, phone,
   }) {
     const [row] = await db.query(`
-    INSERT INTO users(cpf, name, email, phone)
-    VALUES($1,$2,$3,$4)
+    INSERT INTO users(cpf, name, password, email, phone)
+    VALUES($1,$2,$3,$4,$5)
     RETURNING *
-    `, [cpf, name, email, phone]);
+    `, [cpf, name, password, email, phone]);
 
     return row;
   }
 
   async update(cpf, {
-    name, email, phone,
+    email, phone,
   }) {
     const [row] = await db.query(`
       UPDATE users U
-      SET name = $1, email = $2, phone = $3
-      WHERE U.cpf = $4
+      SET email = $1, phone = $2
+      WHERE U.cpf = $3
       RETURNING *
-    `, [name, email, phone, cpf]);
+    `, [email, phone, cpf]);
     return row;
   }
 

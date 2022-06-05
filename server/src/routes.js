@@ -10,6 +10,7 @@ const router = Router();
 
 router.get('/users', UserController.index);
 router.get('/users/:cpf', UserController.show);
+router.get('/users/:cpf/:password', UserController.login);
 router.delete('/users/:cpf', UserController.delete);
 router.post('/users', UserController.store);
 router.put('/users/:cpf', UserController.update);

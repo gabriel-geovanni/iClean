@@ -28,11 +28,11 @@ class UserController {
 
   async store(request, response) {
     const {
-      cpf, name, email, phone,
+      cpf, name, password, email, phone,
     } = request.body;
 
     if (!cpf) {
-      return response.status(400).json({ error: 'Campo CPF é obrigatório' });
+      return response.status(400).json({ error: 'Digite um cpf' });
     }
 
     const userExists = await UsersRepository.findByCpf(cpf);
@@ -41,8 +41,12 @@ class UserController {
       return response.status(400).json({ error: 'Esse CPF já está cadastrado' });
     }
 
+    if (!password) {
+      return response.status(400).json({ error: 'Digite uma senha' });
+    }
+
     if (!name) {
-      return response.status(400).json({ error: 'Campo NOME é obrigatório' });
+      return response.status(400).json({ error: 'Digite um nome' });
     }
 
     if (!phone && !email) {
@@ -56,7 +60,7 @@ class UserController {
     }
 
     const user = await UsersRepository.create({
-      cpf, name, email, phone,
+      cpf, name, password, email, phone,
     });
 
     const rate = await RatingsRepository.create({
@@ -71,10 +75,36 @@ class UserController {
     response.json(user);
   }
 
+  async login(request, response) {
+    const {
+      cpf, password,
+    } = request.body;
+
+    if (!cpf) {
+      return response.status(400).json({ error: 'Digite um cpf' });
+    }
+
+    const userExists = await UsersRepository.findByCpf(cpf);
+
+    if (!userExists) {
+      return response.status(400).json({ error: 'Usuário não encontrado' });
+    }
+
+    if (!password) {
+      return response.status().jeson({ error: 'Digite uma senha' });
+    }
+
+    if (userExists.password !== password) {
+      return response.status(406).json({ error: 'Senha incorreta' });
+    }
+
+    response.json(userExists);
+  }
+
   async update(request, response) {
     const { cpf } = request.params;
     const {
-      name, email, phone,
+      email, phone,
     } = request.body;
 
     const usersExists = await UsersRepository.findByCpf(cpf);
@@ -82,16 +112,8 @@ class UserController {
       return response.status(404).json({ error: 'Usuário não encontrado' });
     }
 
-    if (!name) {
-      return response.status(400).json({ error: 'Campo NOME é obrigatório' });
-    }
-
-    if (!email) {
-      return response.status(400).json({ error: 'Campo E-MAIL é obrigatório' });
-    }
-
-    if (!phone) {
-      return response.status(400).json({ error: 'Número de telefone é obrigatório' });
+    if (!phone && !email) {
+      return response.status(400).json({ error: 'Necessário escolher uma forma de contato' });
     }
 
     const usersByEmail = await UsersRepository.findByEmail(email);
@@ -101,7 +123,7 @@ class UserController {
     }
 
     const user = await UsersRepository.update(cpf, {
-      name, email, phone,
+      email, phone,
     });
 
     response.json(user);
