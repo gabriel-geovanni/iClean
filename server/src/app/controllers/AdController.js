@@ -5,7 +5,7 @@ class AdController {
   async index(request, response) {
     const { orderBy } = request.query;
     const ads = await AdsRepository.findAll(orderBy);
-
+    response.header('Access-Control-Allow-Origin', '*');
     response.json(ads);
   }
 
@@ -56,8 +56,11 @@ class AdController {
   async update(request, response) {
     const { id } = request.params;
     const {
-      type, price, description, availability, status,
+      type, price, description, availability, cpf,
     } = request.body;
+    console.log({
+      id, type, price, description, availability,
+    });
 
     const adssExists = await AdsRepository.findById(id);
     if (!adssExists) {
@@ -77,7 +80,7 @@ class AdController {
     }
 
     const ad = await AdsRepository.update(id, {
-      type, price, description, availability, status,
+      type, price, description, availability, cpf,
     });
 
     response.json(ad);
@@ -85,7 +88,6 @@ class AdController {
 
   async delete(request, response) {
     const { id } = request.params;
-
     await AdsRepository.delete(id);
     response.sendStatus(204);
   }

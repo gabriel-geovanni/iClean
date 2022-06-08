@@ -4,18 +4,18 @@ class UsersRepository {
   async findAll(orderBy = 'ASC') {
     const direction = orderBy.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
     const rows = await db.query(`SELECT * FROM users ORDER BY name ${direction}`);
-    return rows;
+    return rows.map((row) => ({ ...row, password: '' }));
   }
 
-  async findByCpf(cpf) {
-    const [row] = await db.query('SELECT * FROM users U WHERE U.cpf = $1', [cpf]);
-
-    return row;
+  async findByCpf(cpf, type = 'default') {
+    const [user] = await db.query('SELECT * FROM users U WHERE U.cpf = $1', [cpf]);
+    if (type === 'login') return { ...user };
+    if (user?.name) { return { ...user, password: '' }; }
+    return null;
   }
 
   async findByEmail(email) {
     const [row] = await db.query('SELECT * FROM users U WHERE U.email = $1', [email]);
-
     return row;
   }
 
@@ -32,14 +32,14 @@ class UsersRepository {
   }
 
   async update(cpf, {
-    email, phone,
+    password, email, phone,
   }) {
     const [row] = await db.query(`
       UPDATE users U
-      SET email = $1, phone = $2
-      WHERE U.cpf = $3
+      SET password = $1, email = $2, phone = $3
+      WHERE U.cpf = $4
       RETURNING *
-    `, [email, phone, cpf]);
+    `, [password, email, phone, cpf]);
     return row;
   }
 

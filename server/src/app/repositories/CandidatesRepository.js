@@ -1,7 +1,6 @@
 const db = require('../../database');
 const RatingsRepository = require('./RatingsRepository');
 const UsersRepository = require('./UsersRepository');
-const AdsRepository = require('./AdsRepository');
 
 class CandidatesRepository {
   async listCandidates(ad_id) {
@@ -16,13 +15,9 @@ class CandidatesRepository {
   }
 
   async listAds(cpf) {
-    const candidates = await db.query('SELECT * FROM candidates C WHERE C.ucpf = $1', [cpf]);
-    const list = await Promise.all(candidates.map(async (candidate) => {
-      const ad = await AdsRepository.findById(candidate.ad_id);
-      return { ...candidate, ad };
-    }));
+    const candidates = await db.query('SELECT C.ad_id FROM candidates C WHERE C.ucpf = $1', [cpf]);
 
-    return list;
+    return candidates;
   }
 
   async create({
@@ -40,7 +35,7 @@ class CandidatesRepository {
   async delete(cpf, ad_id) {
     const deleteOp = await db.query(`
     DELETE FROM candidates C
-    WHERE C.cpf = $1 AND C.ad_id = $2
+    WHERE C.ucpf = $1 AND C.ad_id = $2
     `, [cpf, ad_id]);
     return deleteOp;
   }

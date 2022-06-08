@@ -12,7 +12,6 @@ class CandidateController {
     }
 
     const candidates = await CandidatesRepository.listCandidates(ad_id);
-
     response.json(candidates);
   }
 
@@ -25,7 +24,6 @@ class CandidateController {
     }
 
     const ads = await CandidatesRepository.listAds(cpf);
-
     response.json(ads);
   }
 
@@ -39,6 +37,7 @@ class CandidateController {
     }
 
     const cpfExists = await UsersRepository.findByCpf(cpf);
+
     if (!cpfExists) {
       return response.status(404).json({ error: 'Usuário não encontrado' });
     }
@@ -48,6 +47,7 @@ class CandidateController {
     }
 
     const adExists = await AdsRepository.findById(ad_id);
+
     if (!adExists) {
       return response.status(400).json({ error: 'Esse anúncio não existe!' });
     }
@@ -61,20 +61,6 @@ class CandidateController {
 
   async delete(request, response) {
     const { cpf, ad_id } = request.params;
-
-    const cpfExists = await UsersRepository.findByCpf(cpf);
-    if (!cpfExists) {
-      return response.status(404).json({ error: 'CPF não encontrado' });
-    }
-
-    if (!ad_id) {
-      return response.status(400).json({ error: 'Necessário informar o anúncio' });
-    }
-
-    const adExists = await AdsRepository.findById(ad_id);
-    if (!adExists) {
-      return response.status(400).json({ error: 'Esse anúncio não existe!' });
-    }
 
     await CandidatesRepository.delete(cpf, ad_id);
     response.sendStatus(204);

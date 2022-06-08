@@ -8,10 +8,14 @@ class ServicesRepository {
     return rows;
   }
 
-  async findById(id) {
-    const [row] = await db.query('SELECT * FROM services S WHERE S.id = $1', [id]);
+  async findByCpf(cpf) {
+    const rows = await db.query(`
+    SELECT *
+    FROM services S
+    WHERE S.cpf_provider = $1 OR S.cpf_customer = $1
+    `, [cpf]);
 
-    return row;
+    return rows;
   }
 
   async findByType(type) {
@@ -21,26 +25,27 @@ class ServicesRepository {
   }
 
   async create({
-    type, price, date, status, cpf_provider, cpf_customer, ad_id,
+    type, price, date, description, cpf_provider, rateProvider, cpf_customer, rateCustomer, ad_id,
   }) {
     const [row] = await db.query(`
-    INSERT INTO services(type, price, date, status, cpf_provider, cpf_customer, ad_id)
-    VALUES($1,$2,$3,$4,$5,$6,$7)
+    INSERT INTO services(type, price, date, description, cpf_provider, rateProvider,
+                          cpf_customer, rateCustomer, ad_id)
+    VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)
     RETURNING *
-    `, [type, price, date, status, cpf_provider, cpf_customer, ad_id]);
+    `, [type, price, date, description, cpf_provider, rateProvider, cpf_customer, rateCustomer, ad_id]);
 
     return row;
   }
 
   async update(id, {
-    type, price, date, status,
+    type, price, date, rateProvider, rateCustomer,
   }) {
     const [row] = await db.query(`
       UPDATE services
-      SET type = $1, price = $2, date = $3, status = $4
-      WHERE id = $5
+      SET type = $1, price = $2, date = $3, rateProvider = $4, rateCustomer = $5
+      WHERE id = $6
       RETURNING *
-    `, [type, price, date, status, id]);
+    `, [type, price, date, rateProvider, rateCustomer, id]);
 
     return row;
   }

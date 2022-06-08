@@ -10,6 +10,7 @@ class UserController {
       return { ...user, average };
     }));
 
+    response.header('Access-Control-Allow-Origin', '*');
     response.json(list);
   }
 
@@ -23,12 +24,13 @@ class UserController {
 
     const average = await RatingsRepository.findByCpf(cpf);
 
+    response.header('Access-Control-Allow-Origin', '*');
     response.json({ ...user, average });
   }
 
   async store(request, response) {
     const {
-      cpf, name, password, email, phone,
+      cpf, name, password, phone, email,
     } = request.body;
 
     if (!cpf) {
@@ -71,21 +73,21 @@ class UserController {
       await UsersRepository.delete(cpf);
       return response.staus(400);
     }
-
-    response.json(user);
+    response.json({ ...user, password: '' });
   }
 
   async login(request, response) {
     const {
       cpf, password,
-    } = request.body;
+    } = request.params;
+
+    response.header('Access-Control-Allow-Origin', '*');
 
     if (!cpf) {
       return response.status(400).json({ error: 'Digite um cpf' });
     }
 
-    const userExists = await UsersRepository.findByCpf(cpf);
-
+    const userExists = await UsersRepository.findByCpf(cpf, 'login');
     if (!userExists) {
       return response.status(400).json({ error: 'Usuário não encontrado' });
     }
@@ -98,18 +100,22 @@ class UserController {
       return response.status(406).json({ error: 'Senha incorreta' });
     }
 
-    response.json(userExists);
+    response.json({ ...userExists, password: '' });
   }
 
   async update(request, response) {
     const { cpf } = request.params;
     const {
-      email, phone,
+      password, email, phone,
     } = request.body;
 
     const usersExists = await UsersRepository.findByCpf(cpf);
     if (!usersExists) {
       return response.status(404).json({ error: 'Usuário não encontrado' });
+    }
+
+    if (!password) {
+      return response.status(404).json({ error: 'Escolha uma senha' });
     }
 
     if (!phone && !email) {
@@ -123,9 +129,11 @@ class UserController {
     }
 
     const user = await UsersRepository.update(cpf, {
-      email, phone,
+      password, email, phone,
     });
 
+    response.header('Access-Control-Allow-Origin', '*');
+    response.header('Access-Control-Allow-Origin', '*');
     response.json(user);
   }
 

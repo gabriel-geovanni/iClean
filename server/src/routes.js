@@ -22,7 +22,7 @@ router.post('/ads', AdController.store);
 router.put('/ads/:id', AdController.update);
 
 router.get('/services', ServiceController.index);
-router.get('/services/:id', ServiceController.show);
+router.get('/services/:cpf', ServiceController.show);
 router.delete('/services/:id', ServiceController.delete);
 router.post('/services', ServiceController.store);
 router.put('/services/:id', ServiceController.update);

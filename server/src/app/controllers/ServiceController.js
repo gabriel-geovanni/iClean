@@ -1,6 +1,7 @@
 const ServicesRepository = require('../repositories/ServicesRepository');
 const UsersRepository = require('../repositories/UsersRepository');
 const AdsRepository = require('../repositories/AdsRepository');
+const RatingsRepository = require('../repositories/RatingsRepository');
 
 class ServiceController {
   async index(request, response) {
@@ -11,21 +12,31 @@ class ServiceController {
   }
 
   async show(request, response) {
-    const { id } = request.params;
-    const service = await ServicesRepository.findById(id);
+    const { cpf } = request.params;
+    const service = await ServicesRepository.findByCpf(cpf);
 
     if (!service) {
-      return response.status(404).json({ error: 'Serviço não encontrserviceo' });
+      return response.status(404).json({ error: 'Você não possui serviços' });
     }
 
-    response.json(service);
+    const list = await Promise.all(service.map(async (s) => {
+      const provider = await UsersRepository.findByCpf(s.cpf_provider);
+      const averageProvider = await RatingsRepository.findByCpf(s.cpf_provider);
+      const customer = await UsersRepository.findByCpf(s.cpf_customer);
+      const averageCustomer = await RatingsRepository.findByCpf(s.cpf_customer);
+      return {
+        ...s, provider, averageProvider, customer, averageCustomer,
+      };
+    }));
+
+    response.json(list);
   }
 
   async store(request, response) {
     const {
-      type, price, date, status, cpf_provider, cpf_customer, ad_id,
+      type, price, date, description, cpf_provider, cpf_customer, ad_id,
     } = request.body;
-
+    console.log(request.body);
     if (!type) {
       return response.status(400).json({ error: 'Digite o tipo do serviço' });
     }
@@ -65,9 +76,15 @@ class ServiceController {
       return response.status(404).json({ error: 'Informe um anúncio válido!' });
     }
 
+    console.log('Antes serviço');
+
     const service = await ServicesRepository.create({
-      type, price, date, status: status !== 't', cpf_provider, cpf_customer, ad_id,
+      type, price, date, description, cpf_provider, rateProvider: 'f', cpf_customer, rateCustomer: 'f', ad_id,
     });
+
+    console.log('Depois serviço');
+
+    await AdsRepository.changeStatus(ad_id);
 
     response.json(service);
   }
@@ -75,7 +92,7 @@ class ServiceController {
   async update(request, response) {
     const { id } = request.params;
     const {
-      type, price, date, status,
+      type, price, date, rateProvider, rateCustomer,
     } = request.body;
 
     const servicesExists = await ServicesRepository.findById(id);
@@ -95,12 +112,8 @@ class ServiceController {
       return response.status(400).json({ error: 'Digite a data que foi/será efetuado' });
     }
 
-    if (!status) {
-      return response.status(400).json({ error: 'Informe o status do serviço' });
-    }
-
     const service = await ServicesRepository.update(id, {
-      type, price, date, status,
+      type, price, date, rateProvider, rateCustomer,
     });
 
     response.json(service);
